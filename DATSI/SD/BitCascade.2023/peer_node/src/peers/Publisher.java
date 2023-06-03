@@ -17,6 +17,7 @@ import interfaces.Tracker;
 public class Publisher extends UnicastRemoteObject implements Seed {
     public static final long serialVersionUID=1234567890L;
     String name; // nombre del nodo (solo para depurar)
+    String BORRAR;
     String file;
     String path; // convenio: path = name + "/" + file
     int blockSize;
