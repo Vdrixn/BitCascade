@@ -63,8 +63,9 @@ public class Publisher extends UnicastRemoteObject implements Seed {
                 buf = new byte[bufSize];
                 System.out.println(buf.length);
                 raf.seek(numBlockRequested * blockSize);
-                raf.read(buf); 
+                int breaded =  raf.read(buf); 
                 System.out.println("publisher read " + numBl);   
+                System.out.println("breaded: " + breaded);
             }
         }catch(IOException e){
             e.printStackTrace();

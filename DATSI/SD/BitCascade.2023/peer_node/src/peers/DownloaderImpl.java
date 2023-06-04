@@ -79,8 +79,8 @@ public class DownloaderImpl {
     public boolean downloadBlock(int numBl) throws RemoteException {
         // TODO 2: Lee bloque del seed y lo escribe en el fichero
         byte[] buf= seed.read(numBl);
-        System.out.println(buf.length);
         if(buf==null) return false;
+        System.out.println(buf.length);
         try {
             raf.write(buf);
         } catch (IOException e) {
