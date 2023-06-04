@@ -22,12 +22,12 @@ import interfaces.FileInfo;
 class TrackerSrv extends UnicastRemoteObject implements Tracker  {
     public static final long serialVersionUID=1234567890L;
     String name;
-    // TODO 1: añadir los campos que se requieran
+    // añadir los campos que se requieran
     HashMap<String,FileInfo> files;
     
     public TrackerSrv(String n) throws RemoteException {
         name = n;
-        // TODO 1: inicializar campos adicionales
+        // inicializar campos adicionales
         files=new HashMap<String, FileInfo>();
     }
     // NO MODIFICAR: solo para depurar
@@ -37,8 +37,8 @@ class TrackerSrv extends UnicastRemoteObject implements Tracker  {
     // se publica fichero: debe ser sincronizado para asegurar exclusión mutua;
     // devuelve falso si ya estaba publicado un fichero con el mismo nombre
     public synchronized boolean announceFile(Seed publisher, String fileName, int blockSize, int numBlocks) throws RemoteException {
-        // TODO 1: se crea un objeto FileInfo con la información del fichero
-	// y se inserta en el mapa
+        // se crea un objeto FileInfo con la información del fichero
+	    // y se inserta en el mapa
         if(files.get(fileName)==null){
             FileInfo f=new  FileInfo(publisher, blockSize, numBlocks);
             files.put(fileName,f);
@@ -47,13 +47,18 @@ class TrackerSrv extends UnicastRemoteObject implements Tracker  {
         }
         return false;
     }
-    // TODO 1: obtiene acceso a la metainformación de un fichero
+    // obtiene acceso a la metainformación de un fichero
     public synchronized FileInfo lookupFile(String fileName) throws RemoteException {
         FileInfo f=files.get(fileName);
         return f;
     }
     // TODO 3: se añade un nuevo leech a ese fichero (tercera fase)
     public boolean addLeech(Leech leech, String fileName) throws RemoteException {
+        FileInfo f=files.get(fileName);
+        if(f!=null){
+            f.getLeechList().add(leech);
+            return true;
+        }
         return false;
     }
     static public void main (String args[])  {
@@ -65,10 +70,10 @@ class TrackerSrv extends UnicastRemoteObject implements Tracker  {
             System.setSecurityManager(new SecurityManager());
         try {
             TrackerSrv srv = new TrackerSrv(args[1]);
-            // TODO 1: localiza el registry en el puerto recibido en args[0]]
-	    // y da de alta el servicio bajo el nombre "BitCascade"
-        Registry registry = LocateRegistry.getRegistry(Integer.parseInt(args[0]));
-        registry.rebind("BitCascade",srv);
+            // localiza el registry en el puerto recibido en args[0]]
+            // y da de alta el servicio bajo el nombre "BitCascade"
+            Registry registry = LocateRegistry.getRegistry(Integer.parseInt(args[0]));
+            registry.rebind("BitCascade",srv);
 
         }
         catch (Exception e) {

@@ -8,6 +8,7 @@
 package peers;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.LinkedList;
 import java.rmi.RemoteException;
 
 import interfaces.Seed;
@@ -41,7 +42,7 @@ class LeechInfo {
 // Esta clase actúa solo de cliente en las dos primeras fases, pero
 // en las dos últimas ejerce también como servidor convirtiéndose en
 // un objeto remoto.
-public class DownloaderImpl { 
+public class DownloaderImpl implements Leech{ 
     String name; // nombre del nodo (solo para depurar)
     String file;
     String path;
@@ -50,6 +51,7 @@ public class DownloaderImpl {
     int lastBlock = -1; // último bloque descargado por este Leech
     Seed seed;
     FileInfo fInfo;
+    LeechInfo[] lInfo;
     RandomAccessFile raf;
 
     public DownloaderImpl(String n, String f, FileInfo finf) throws RemoteException, IOException {
@@ -60,11 +62,20 @@ public class DownloaderImpl {
         numBlocks = finf.getNumBlocks();
         seed = finf.getSeed();
         fInfo = finf;
-        // TODO 2: abre el fichero para escritura
+
+        // abre el fichero para escritura
         raf= new RandomAccessFile(new File(path), "rw");
         raf.setLength(0);
+
         // TODO 3: obtiene el número del último bloque descargado por leeches
-	// anteriores (contenidos en FileInfo) usando getLastBlockNumber
+	    // anteriores (contenidos en FileInfo) usando getLastBlockNumber
+        LinkedList<Leech> leechList = fInfo.getLeechList();
+        
+        lInfo = new LeechInfo[leechList.size()];
+        for(Leech e : leechList){
+            lInfo[leechList.indexOf(e)] = new LeechInfo(e, e.getLastBlockNumber());
+        }
+        
 
         // TODO 4: solicita a esos leeches anteriores usando newLeech
         // que le notifiquen cuando progrese su descarga
@@ -78,18 +89,19 @@ public class DownloaderImpl {
     }
     // realiza la descarga de un bloque y lo almacena en un fichero local
     public boolean downloadBlock(int numBl) throws RemoteException {
-        // TODO 2: Lee bloque del seed y lo escribe en el fichero
+        // Lee bloque del seed y lo escribe en el fichero
         byte[] buf= seed.read(numBl);
         if(buf==null) return false;
         System.out.println(buf.length);
         try {
             raf.write(buf);
+            lastBlock = numBl;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-	// TODO 3: Alterna leer bloques del seed y de otros leeches
-	// TODO 4: Notifica a los leeches posteriores (notifyBlock)
+        // TODO 3: Alterna leer bloques del seed y de otros leeches
+
+        // TODO 4: Notifica a los leeches posteriores (notifyBlock)
         return true;
     }
 
@@ -106,6 +118,32 @@ public class DownloaderImpl {
         System.out.println("downloader read " + numBl);
         // TODO 3: realiza lectura solicitada devolviendo lo leído en buf 
         // Cuidado con último bloque que probablemente no estará completo
+        if(numBl<=lastBlock){
+            try{
+                int numBlockRequested = numBl;
+                long fileSizeBytes = new File(path).length();
+                // se asegura que el bloque solicitado está dentro del fichero
+                if (numBlockRequested < numBlocks) {
+                    int bufSize = blockSize;
+                    if (numBlockRequested + 1 == numBlocks) { // último bloque
+                        System.out.println("Estoy en el ultimo bloque.");
+                        int fragmentSize = (int) (fileSizeBytes % blockSize);
+                        System.out.println("fragmentSize: " + fragmentSize);
+                        if (fragmentSize > 0) bufSize = fragmentSize;
+                        System.out.println("bufSize: " + bufSize);
+                    }
+                    System.out.println("bufSize: " + bufSize);
+                    buf = new byte[bufSize];
+                    System.out.println(buf.length);
+                    raf.seek(numBlockRequested * blockSize);
+                    int breaded =  raf.read(buf); 
+                    System.out.println("publisher read " + numBl);   
+                    System.out.println("breaded: " + breaded);
+                }
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
         return buf;
     } 
     // obtiene cuál es el último bloque descargado por este Leech
@@ -116,12 +154,12 @@ public class DownloaderImpl {
     // leech solicitante será notificado del progreso de la descarga
     public void newLeech(Leech requester) throws RemoteException {
         // TODO 4: añade ese leech a la lista de leeches posteriores
-	// que deben ser notificados
+	    // que deben ser notificados
     }
     // Informa del progreso de la descarga
     public void notifyBlock(Leech l, int nBl) throws RemoteException {
         // TODO 4: actualizamos la información sobre el último bloque
-	// descargado por ese leech
+	    // descargado por ese leech
     }
 
     // método estático que obtiene del registry una referencia al tracker y
@@ -133,7 +171,7 @@ public class DownloaderImpl {
 
         DownloaderImpl down = null;
         try {
-            // TODO 1: localiza el registry en el host y puerto indicado
+            // localiza el registry en el host y puerto indicado
             // y obtiene la referencia remota al tracker asignándola
             // a esta variable:
             Registry registry = LocateRegistry.getRegistry(host,port);
@@ -141,7 +179,7 @@ public class DownloaderImpl {
             
             // comprobamos si ha obtenido bien la referencia:
             System.out.println("el nombre del nodo del tracker es: " + trck.getName());
-            // TODO 1: obtiene la información del fichero mediante el
+            // obtiene la información del fichero mediante el
 	        // método lookupFile del Tracker.
             FileInfo finf = trck.lookupFile(file); // asigna resultado de lookupFile
 
@@ -150,10 +188,11 @@ public class DownloaderImpl {
                 System.err.println("Fichero no publicado");
                 System.exit(1);
             }
-            // TODO 1: crea un objeto de la clase DownloaderImpl
+            // crea un objeto de la clase DownloaderImpl
             down = new DownloaderImpl(name, file, finf);
 
             // TODO 3: usa el método addLeech del tracker para añadirse
+            trck.addLeech(down, name);
         }
         catch (Exception e) {
             System.err.println("Downloader exception:");

@@ -34,7 +34,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
 	//     truco: ⌈x/y⌉ -> (x+y-1)/y
         numBlocks = (int) (new File(path).length() + blockSize - 1)/blockSize;
 
-        // TODO 2: abrir el fichero para leer (RandomAccessFile)
+        // abrir el fichero para leer (RandomAccessFile)
         raf=new RandomAccessFile(new File(path), "r");
         
     }
@@ -44,7 +44,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
     public byte [] read(int numBl) throws RemoteException {
         byte [] buf = null;
 
-        // TODO 2: realiza lectura solicitada devolviendo lo leído en buf 
+        // realiza lectura solicitada devolviendo lo leído en buf 
 	    // Cuidado con último bloque que probablemente no estará completo
         try{
             int numBlockRequested = numBl;
@@ -88,7 +88,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
             System.setSecurityManager(new SecurityManager());
 
         try {
-            // TODO 1: localiza el registry en el host y puerto indicado
+            // localiza el registry en el host y puerto indicado
             // y obtiene la referencia remota al tracker asignándola
             // a esta variable:
             Registry registry = LocateRegistry.getRegistry(args[0],Integer.parseInt(args[1]));
@@ -97,7 +97,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
 
             // comprobamos si ha obtenido bien la referencia:
             System.out.println("el nombre del nodo del tracker es: " + trck.getName());
-            // TODO 1: crea un objeto de la clase Publisher y usa el método
+            // crea un objeto de la clase Publisher y usa el método
             // remoto announceFile del Tracker para publicar el fichero
             // (nº bloques disponible en getNumBlocks de esa clase)
             //
