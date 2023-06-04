@@ -32,6 +32,8 @@ public class Publisher extends UnicastRemoteObject implements Seed {
         numBlocks = (int) (new File(path).length() + blockSize - 1)/blockSize;
 
         // TODO 2: abrir el fichero para leer (RandomAccessFile)
+        
+        
     }
     public String getName() throws RemoteException {
         return name;
@@ -63,6 +65,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
             // y obtiene la referencia remota al tracker asignándola
             // a esta variable:
             Tracker trck = null;
+            
 
             // comprobamos si ha obtenido bien la referencia:
             System.out.println("el nombre del nodo del tracker es: " + trck.getName());

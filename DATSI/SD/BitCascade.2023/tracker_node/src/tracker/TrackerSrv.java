@@ -9,6 +9,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+
 import interfaces.Tracker;
 import interfaces.Seed;
 import interfaces.Leech;
@@ -21,10 +23,12 @@ class TrackerSrv extends UnicastRemoteObject implements Tracker  {
     public static final long serialVersionUID=1234567890L;
     String name;
     // TODO 1: añadir los campos que se requieran
+    HashMap<String,FileInfo> files;
     
     public TrackerSrv(String n) throws RemoteException {
         name = n;
         // TODO 1: inicializar campos adicionales
+        files=new HashMap<String, FileInfo>();
     }
     // NO MODIFICAR: solo para depurar
     public String getName() throws RemoteException {
@@ -35,6 +39,7 @@ class TrackerSrv extends UnicastRemoteObject implements Tracker  {
     public synchronized boolean announceFile(Seed publisher, String fileName, int blockSize, int numBlocks) throws RemoteException {
         // TODO 1: se crea un objeto FileInfo con la información del fichero
 	// y se inserta en el mapa
+    FileInfo f=new  FileInfo(publisher, blockSize, numBlocks);
         System.out.println(publisher.getName() + " ha publicado " + fileName);
         return false;
     }
