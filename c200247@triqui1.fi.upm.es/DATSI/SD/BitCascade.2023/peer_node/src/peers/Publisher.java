@@ -10,8 +10,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-
 import interfaces.Seed;
 import interfaces.Tracker;
 
@@ -23,7 +21,6 @@ public class Publisher extends UnicastRemoteObject implements Seed {
     String path; // convenio: path = name + "/" + file
     int blockSize;
     int numBlocks;
-    RandomAccessFile raf;
 
     public Publisher(String n, String f, int bSize) throws RemoteException, IOException {
         name = n; // nombre del nodo (solo para depurar)
@@ -35,7 +32,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
         numBlocks = (int) (new File(path).length() + blockSize - 1)/blockSize;
 
         // TODO 2: abrir el fichero para leer (RandomAccessFile)
-        raf=new RandomAccessFile(file, "r");
+        
         
     }
     public String getName() throws RemoteException {
@@ -46,24 +43,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
         System.out.println("publisher read " + numBl);
 
         // TODO 2: realiza lectura solicitada devolviendo lo leído en buf 
-	    // Cuidado con último bloque que probablemente no estará completo
-        try{
-            int numBlockRequested = numBl;
-            long fileSizeBytes = new File(file).length();
-            // se asegura que el bloque solicitado está dentro del fichero
-            if (numBlockRequested < numBlocks) {
-                int bufSize = blockSize;
-                if (numBlockRequested + 1 == numBlocks) { // último bloque
-                    int fragmentSize = (int) (fileSizeBytes % blockSize);
-                    if (fragmentSize > 0) bufSize = fragmentSize;
-                }
-                buf = new byte[bufSize];
-                raf.seek(numBlockRequested * blockSize);
-                raf.read(buf);    
-            }
-        }catch(IOException e){
-            e.printStackTrace();
-        }
+	// Cuidado con último bloque que probablemente no estará completo
         return buf;
     }
     public int getNumBlocks() { // no es método remoto
@@ -95,7 +75,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
             // (nº bloques disponible en getNumBlocks de esa clase)
             //
             Publisher pub= new Publisher(args[2],args[3],Integer.parseInt(args[4]));
-            boolean res = trck.announceFile(pub, args[3], Integer.parseInt(args[4]), pub.getNumBlocks()); // asigna resultado de announceFile
+            boolean res = trck.announceFile(pub, args[2], Integer.parseInt(args[4]), pub.getNumBlocks()); // asigna resultado de announceFile
             if (!res) { // comprueba resultado
                 // si false: ya existe fichero publicado con ese nombre
                 System.err.println("Fichero ya publicado");

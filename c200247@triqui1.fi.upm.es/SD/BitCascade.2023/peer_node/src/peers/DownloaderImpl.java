@@ -15,7 +15,6 @@ import interfaces.Leech;
 import interfaces.Tracker;
 import interfaces.FileInfo;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 // Un Leech guarda en esta clase auxiliar su conocimiento sobre cuál es el
 // último bloque descargado por otro Leech.
@@ -48,7 +47,6 @@ public class DownloaderImpl {
     int lastBlock = -1; // último bloque descargado por este Leech
     Seed seed;
     FileInfo fInfo;
-    RandomAccessFile raf;
 
     public DownloaderImpl(String n, String f, FileInfo finf) throws RemoteException, IOException {
         name = n;
@@ -59,7 +57,7 @@ public class DownloaderImpl {
         seed = finf.getSeed();
         fInfo = finf;
         // TODO 2: abre el fichero para escritura
-        raf= new RandomAccessFile(file, "w");
+
         // TODO 3: obtiene el número del último bloque descargado por leeches
 	// anteriores (contenidos en FileInfo) usando getLastBlockNumber
 
@@ -76,17 +74,9 @@ public class DownloaderImpl {
     // realiza la descarga de un bloque y lo almacena en un fichero local
     public boolean downloadBlock(int numBl) throws RemoteException {
         // TODO 2: Lee bloque del seed y lo escribe en el fichero
-        byte[] buf= fInfo.getSeed().read(numBl);
-        if(buf==null) return false;
-        try {
-            raf.write(buf);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 	// TODO 3: Alterna leer bloques del seed y de otros leeches
 	// TODO 4: Notifica a los leeches posteriores (notifyBlock)
-        return true;
+        return false;
     }
 
     /* métodos remotos que solo se usarán cuando se convierta en
