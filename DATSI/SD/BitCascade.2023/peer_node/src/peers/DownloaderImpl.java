@@ -62,6 +62,7 @@ public class DownloaderImpl {
         fInfo = finf;
         // TODO 2: abre el fichero para escritura
         raf= new RandomAccessFile(new File(path), "rw");
+        raf.setLength(0);
         // TODO 3: obtiene el número del último bloque descargado por leeches
 	// anteriores (contenidos en FileInfo) usando getLastBlockNumber
 
