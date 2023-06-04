@@ -35,7 +35,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
         numBlocks = (int) (new File(path).length() + blockSize - 1)/blockSize;
 
         // TODO 2: abrir el fichero para leer (RandomAccessFile)
-        raf=new RandomAccessFile(file, "r");
+        raf=new RandomAccessFile(new File(path), "r");
         
     }
     public String getName() throws RemoteException {
@@ -43,7 +43,6 @@ public class Publisher extends UnicastRemoteObject implements Seed {
     }
     public byte [] read(int numBl) throws RemoteException {
         byte [] buf = null;
-        System.out.println("publisher read " + numBl);
 
         // TODO 2: realiza lectura solicitada devolviendo lo leído en buf 
 	    // Cuidado con último bloque que probablemente no estará completo
@@ -59,7 +58,8 @@ public class Publisher extends UnicastRemoteObject implements Seed {
                 }
                 buf = new byte[bufSize];
                 raf.seek(numBlockRequested * blockSize);
-                raf.read(buf);    
+                raf.read(buf); 
+                System.out.println("publisher read " + numBl);   
             }
         }catch(IOException e){
             e.printStackTrace();

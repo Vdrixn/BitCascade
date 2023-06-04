@@ -14,6 +14,8 @@ import interfaces.Seed;
 import interfaces.Leech;
 import interfaces.Tracker;
 import interfaces.FileInfo;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -59,7 +61,7 @@ public class DownloaderImpl {
         seed = finf.getSeed();
         fInfo = finf;
         // TODO 2: abre el fichero para escritura
-        raf= new RandomAccessFile(file, "w");
+        raf= new RandomAccessFile(new File(path), "rw");
         // TODO 3: obtiene el número del último bloque descargado por leeches
 	// anteriores (contenidos en FileInfo) usando getLastBlockNumber
 
