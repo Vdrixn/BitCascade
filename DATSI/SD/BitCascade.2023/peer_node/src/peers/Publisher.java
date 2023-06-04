@@ -48,15 +48,20 @@ public class Publisher extends UnicastRemoteObject implements Seed {
 	    // Cuidado con último bloque que probablemente no estará completo
         try{
             int numBlockRequested = numBl;
-            long fileSizeBytes = new File(file).length();
+            long fileSizeBytes = new File(path).length();
             // se asegura que el bloque solicitado está dentro del fichero
             if (numBlockRequested < numBlocks) {
                 int bufSize = blockSize;
                 if (numBlockRequested + 1 == numBlocks) { // último bloque
+                    System.out.println("Estoy en el ultimo bloque.");
                     int fragmentSize = (int) (fileSizeBytes % blockSize);
+                    System.out.println("fragmentSize: " + fragmentSize);
                     if (fragmentSize > 0) bufSize = fragmentSize;
+                    System.out.println("bufSize: " + bufSize);
                 }
+                System.out.println("bufSize: " + bufSize);
                 buf = new byte[bufSize];
+                System.out.println(buf.length);
                 raf.seek(numBlockRequested * blockSize);
                 raf.read(buf); 
                 System.out.println("publisher read " + numBl);   
@@ -64,6 +69,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
         }catch(IOException e){
             e.printStackTrace();
         }
+        
         return buf;
     }
     public int getNumBlocks() { // no es método remoto
