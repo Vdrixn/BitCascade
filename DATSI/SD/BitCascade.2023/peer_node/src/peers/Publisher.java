@@ -64,7 +64,8 @@ public class Publisher extends UnicastRemoteObject implements Seed {
             // TODO 1: localiza el registry en el host y puerto indicado
             // y obtiene la referencia remota al tracker asignándola
             // a esta variable:
-            Tracker trck = null;
+            Registry registry = LocateRegistry.getRegistry(args[0],Integer.parseInt(args[1]));
+            Tracker trck = (Tracker) registry.lookup("BitCascade");
             
 
             // comprobamos si ha obtenido bien la referencia:
@@ -73,7 +74,8 @@ public class Publisher extends UnicastRemoteObject implements Seed {
             // remoto announceFile del Tracker para publicar el fichero
             // (nº bloques disponible en getNumBlocks de esa clase)
             //
-            boolean res = false; // asigna resultado de announceFile
+            Publisher pub= new Publisher(args[2],args[3],Integer.parseInt(args[4]));
+            boolean res = trck.announceFile(pub, args[2], Integer.parseInt(args[4]), pub.getNumBlocks()); // asigna resultado de announceFile
             if (!res) { // comprueba resultado
                 // si false: ya existe fichero publicado con ese nombre
                 System.err.println("Fichero ya publicado");
