@@ -67,6 +67,9 @@ class TrackerSrv extends UnicastRemoteObject implements Tracker  {
             TrackerSrv srv = new TrackerSrv(args[1]);
             // TODO 1: localiza el registry en el puerto recibido en args[0]]
 	    // y da de alta el servicio bajo el nombre "BitCascade"
+        Registry registry = LocateRegistry.getRegistry(Integer.parseInt(args[0]));
+        registry.rebind("BitCascade",srv);
+
         }
         catch (Exception e) {
             System.err.println("Tracker exception:");
