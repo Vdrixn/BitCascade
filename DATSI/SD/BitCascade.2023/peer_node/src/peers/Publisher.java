@@ -75,7 +75,7 @@ public class Publisher extends UnicastRemoteObject implements Seed {
             // (nº bloques disponible en getNumBlocks de esa clase)
             //
             Publisher pub= new Publisher(args[2],args[3],Integer.parseInt(args[4]));
-            boolean res = trck.announceFile(pub, args[2], Integer.parseInt(args[4]), pub.getNumBlocks()); // asigna resultado de announceFile
+            boolean res = trck.announceFile(pub, args[3], Integer.parseInt(args[4]), pub.getNumBlocks()); // asigna resultado de announceFile
             if (!res) { // comprueba resultado
                 // si false: ya existe fichero publicado con ese nombre
                 System.err.println("Fichero ya publicado");
