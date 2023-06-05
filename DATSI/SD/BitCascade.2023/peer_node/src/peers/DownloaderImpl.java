@@ -110,6 +110,9 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
                     try {
                         raf.write(buf);
                         lastBlock = numBl;
+                        for(Leech e : leechNotfRequ){
+                            e.notifyBlock(this,numBl);
+                        }
                         return true;
                     } catch (IOException e) {
                         e.printStackTrace();
