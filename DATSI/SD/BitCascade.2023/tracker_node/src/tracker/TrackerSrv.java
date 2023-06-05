@@ -56,7 +56,7 @@ class TrackerSrv extends UnicastRemoteObject implements Tracker  {
     public boolean addLeech(Leech leech, String fileName) throws RemoteException {
         FileInfo f=files.get(fileName);
         if(f!=null){
-            f.getLeechList().add(leech);
+            f.newLeech(leech);
             return true;
         }
         return false;
