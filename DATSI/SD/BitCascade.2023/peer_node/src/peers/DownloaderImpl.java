@@ -10,6 +10,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.rmi.RemoteException;
 
 import interfaces.Seed;
@@ -55,7 +56,8 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
     LeechInfo[] lInfo;
     RandomAccessFile raf;
     int contDownload;
-    LinkedList<Leech> leechNotfRequ;
+    ConcurrentLinkedQueue<Leech> leechNotfRequ;
+    
 
     public DownloaderImpl(String n, String f, FileInfo finf) throws RemoteException, IOException {
         name = n;
@@ -67,7 +69,7 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
         fInfo = finf;
         lastBlock = -1;
         contDownload = 0;
-        leechNotfRequ = new LinkedList<Leech>();
+        leechNotfRequ = new ConcurrentLinkedQueue<Leech>();
 
         // abre el fichero para escritura
         raf= new RandomAccessFile(new File(path), "rw");
