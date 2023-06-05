@@ -49,12 +49,12 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
     String path;
     int blockSize;
     int numBlocks;
-    int lastBlock = -1; // último bloque descargado por este Leech
+    int lastBlock; // último bloque descargado por este Leech
     Seed seed;
     FileInfo fInfo;
     LeechInfo[] lInfo;
     RandomAccessFile raf;
-    int contDownload = 0;
+    int contDownload;
     LinkedList<Leech> leechNotfRequ;
 
     public DownloaderImpl(String n, String f, FileInfo finf) throws RemoteException, IOException {
@@ -65,12 +65,15 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
         numBlocks = finf.getNumBlocks();
         seed = finf.getSeed();
         fInfo = finf;
+        lastBlock = -1;
+        contDownload = 0;
+        leechNotfRequ = new LinkedList<Leech>();
 
         // abre el fichero para escritura
         raf= new RandomAccessFile(new File(path), "rw");
         raf.setLength(0);
 
-        // TODO 3: obtiene el número del último bloque descargado por leeches
+        // obtiene el número del último bloque descargado por leeches
 	    // anteriores (contenidos en FileInfo) usando getLastBlockNumber
         LinkedList<Leech> leechList = fInfo.getLeechList();
         
@@ -142,7 +145,7 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
     public byte [] read(int numBl) throws RemoteException {
         byte [] buf = null;
         System.out.println("downloader read " + numBl);
-        // TODO 3: realiza lectura solicitada devolviendo lo leído en buf 
+        // realiza lectura solicitada devolviendo lo leído en buf 
         // Cuidado con último bloque que probablemente no estará completo
         try{
             int numBlockRequested = numBl;
@@ -221,7 +224,7 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
             // crea un objeto de la clase DownloaderImpl
             down = new DownloaderImpl(name, file, finf);
 
-            // TODO 3: usa el método addLeech del tracker para añadirse
+            // usa el método addLeech del tracker para añadirse
             if(trck.addLeech(down, file)){
                 System.out.println("downloader added to tracker");
             }else System.out.println("downloader not added to tracker");
