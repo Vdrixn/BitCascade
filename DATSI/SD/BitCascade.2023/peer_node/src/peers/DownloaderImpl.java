@@ -126,7 +126,7 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
         // TODO 4: Notifica a los leeches posteriores (notifyBlock)
         // que se ha descargado un bloque
         for(Leech e : leechNotfRequ){
-            notifyBlock(e,numBl);
+            e.notifyBlock(this,numBl);
         }
         return true;
     }
