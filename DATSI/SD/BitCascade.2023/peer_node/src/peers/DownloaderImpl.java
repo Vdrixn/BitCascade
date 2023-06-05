@@ -114,7 +114,7 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
+                } else return false;
             }else contDownload++;
         }
         buf = seed.read(numBl);
@@ -146,7 +146,6 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
     // prácticamente igual que read del Seed
     public byte [] read(int numBl) throws RemoteException {
         byte [] buf = null;
-        System.out.println("downloader read " + numBl);
         // realiza lectura solicitada devolviendo lo leído en buf 
         // Cuidado con último bloque que probablemente no estará completo
         try{
@@ -167,7 +166,7 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
                 System.out.println(buf.length);
                 raf.seek(numBlockRequested * blockSize);
                 int breaded =  raf.read(buf); 
-                System.out.println("publisher read " + numBl);   
+                System.out.println("downloader read " + numBl);   
                 System.out.println("breaded: " + breaded);
             }
         }catch(IOException e){
