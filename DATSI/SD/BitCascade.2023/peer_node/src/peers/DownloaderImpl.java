@@ -9,8 +9,11 @@ package peers;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.rmi.RemoteException;
 
 import interfaces.Seed;
@@ -53,10 +56,11 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
     int lastBlock; // último bloque descargado por este Leech
     Seed seed;
     FileInfo fInfo;
-    LeechInfo[] lInfo;
+    ArrayList<LeechInfo> lInfo;
     RandomAccessFile raf;
     int contDownload;
     ConcurrentLinkedQueue<Leech> leechNotfRequ;
+    Map<Leech,LeechInfo> leechMap;
     
 
     public DownloaderImpl(String n, String f, FileInfo finf) throws RemoteException, IOException {
@@ -77,12 +81,13 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
 
         // obtiene el número del último bloque descargado por leeches
 	    // anteriores (contenidos en FileInfo) usando getLastBlockNumber
-        LinkedList<Leech> leechList = fInfo.getLeechList();
+        ArrayList<Leech> leechList = new ArrayList<Leech>(fInfo.getLeechList());
         
-        lInfo = new LeechInfo[leechList.size()];
+        lInfo = new ArrayList<LeechInfo>();
         for(Leech e : leechList){
-            lInfo[leechList.indexOf(e)] = new LeechInfo(e, e.getLastBlockNumber());
+            lInfo.add(new LeechInfo(e, e.getLastBlockNumber()));
         }
+        leechMap = lInfo.stream().collect(Collectors.toMap(LeechInfo::getLeech, Function.identity()));
         
         // TODO 4: solicita a esos leeches anteriores usando newLeech
         // que le notifiquen cuando progrese su descarga
@@ -101,9 +106,9 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
     public boolean downloadBlock(int numBl) throws RemoteException {
         byte[] buf = null;
         
-        while(contDownload<lInfo.length){
-            if(numBl<=lInfo[contDownload].getLastBlock()){
-                buf = lInfo[contDownload].getLeech().read(numBl);
+        while(contDownload<lInfo.size()){
+            if(numBl<=lInfo.get(contDownload).getLastBlock()){
+                buf = lInfo.get(contDownload).getLeech().read(numBl);
                 contDownload++;
                 if(buf!=null){
                     System.out.println(buf.length);
@@ -192,11 +197,7 @@ public class DownloaderImpl extends UnicastRemoteObject implements Leech{
     public void notifyBlock(Leech l, int nBl) throws RemoteException {
         // TODO 4: actualizamos la información sobre el último bloque
 	    // descargado por ese leech
-        for(LeechInfo e : lInfo){
-            if(e.getLeech().equals(l)){
-                e.setLastBlock(nBl);
-            }
-        }
+        leechMap.get(l).setLastBlock(nBl);
     }
 
     // método estático que obtiene del registry una referencia al tracker y
